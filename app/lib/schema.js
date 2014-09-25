@@ -103,3 +103,5 @@ function Schema (obj, options) {
   //  });
   //}
 }
+
+module.exports = Schema;

@@ -1,2 +1,13 @@
 <h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<a href="/">Home</a> | 
+<a href="/users">User Records</a>
+<br/>
+<br/>
+<ul>
+  {{#users}}
+    <li>({{uid}}) {{name}}</li>
+  {{/users}}
+</ul>
+<br/>
+<br/>
+<p>User.find(uid) is {{userX.name}} when uid = {{userX.uid}}</p>
