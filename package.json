@@ -1,0 +1,20 @@
+{
+  "name": "neo-mapper",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "bare":  "nodemon ./bin/www",
+    "start": "NODE_ENV=production nodemon ./bin/www",
+    "test":  "DEBUG=myvoice NODE_ENV=development nodemon ./bin/www"
+  },
+  "dependencies": {
+    "express": "~4.8.6",
+    "body-parser": "~1.6.6",
+    "cookie-parser": "~1.3.2",
+    "morgan": "~1.2.3",
+    "serve-favicon": "~2.0.1",
+    "debug": "~1.0.4",
+    "hbs": "~2.7.0",
+    "stylus": "0.42.3"
+  }
+}
