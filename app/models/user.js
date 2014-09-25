@@ -1,11 +1,10 @@
 // user model declaration
-// console.log('User model declaration');
 
-// eventually tie in schema and model file here
-// var model = require('../lib/model.js');
-// var schema  = require('../lib/schema.js');
+// eventually tie in growler db adapter here
+var growler = require('../lib/growler');
 
-// console.log(model('dave'));
+console.log(growler.Model('sam'));
+
 
 var _ = require('underscore');
 
