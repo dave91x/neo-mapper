@@ -1,6 +1,7 @@
 {
   "name": "neo-mapper",
-  "version": "0.0.0",
+  "description": "Map graph database (Neo4j) nodes to JS objects",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "bare":  "nodemon ./bin/www",
@@ -8,13 +9,18 @@
     "test":  "DEBUG=myvoice NODE_ENV=development nodemon ./bin/www"
   },
   "dependencies": {
-    "express": "~4.8.6",
+    "bcrypt-nodejs": "latest",
     "body-parser": "~1.6.6",
     "cookie-parser": "~1.3.2",
-    "morgan": "~1.2.3",
-    "serve-favicon": "~2.0.1",
     "debug": "~1.0.4",
+    "express": "~4.8.6",
     "hbs": "~2.7.0",
-    "stylus": "0.42.3"
+    "moment": "2.8.3",
+    "morgan": "~1.2.3",
+    "node-uuid": "1.4.1",
+    "seraph": "0.9.11",
+    "serve-favicon": "~2.0.1",
+    "stylus": "0.42.3",
+    "underscore": "1.7.0"
   }
 }
