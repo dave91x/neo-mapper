@@ -4,7 +4,10 @@
 var growler    = require('../lib/growler');
 var bcrypt     = require('bcrypt-nodejs');
 var _          = require('underscore');
-// console.log(growler.model('sam'));
+
+// test setup verification
+console.log(growler.version);
+console.log(growler.model('User'));
 
 var users = {
 

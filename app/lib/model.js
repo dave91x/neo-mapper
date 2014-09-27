@@ -9,7 +9,7 @@
  
 function Model (name) {
   
-  return name;
+  return name + " model";
   
 }
 

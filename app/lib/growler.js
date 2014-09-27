@@ -1,3 +1,5 @@
+// this will eventually become the index.js file in the repo lib directory
+
 // db (Neo4j via seraph npm)
 var neoDb   = require("seraph")();
 var Model   = require('./model');
@@ -107,11 +109,17 @@ Growler.prototype.get = Growler.prototype.set;
  
 Growler.prototype.model  = function (name, schema) {
   
+  if ('string' == typeof schema) {
+    schema = false;
+  }
+  
+  var model;
+  
   return this.models[name] = model;
 };
 
 /*
- * Returns an array of model names created on this instance of Mongoose.
+ * Returns an array of model names created on this instance of Growler.
  *
  * #### Note:
  *
@@ -121,43 +129,43 @@ Growler.prototype.model  = function (name, schema) {
  * @return {Array}
  */
 
-Mongoose.prototype.modelNames = function () {
+Growler.prototype.modelNames = function () {
   var names = Object.keys(this.models);
   return names;
 }
 
 /*
- * The Mongoose version
+ * The Growler version
  *
  * @property version
  * @api public
  */
 
-Mongoose.prototype.version = pkg.version;
+Growler.prototype.version = pkg.version;
 
 /*
- * The Mongoose constructor
+ * The Growler constructor
  *
- * The exports of the mongoose module is an instance of this class.
+ * The exports of the growler module is an instance of this class.
  *
  * #### Example:
  *
- *     var mongoose = require('mongoose');
- *     var mongoose2 = new mongoose.Mongoose();
+ *     var growler = require('growler');
+ *     var growler2 = new growler.Growler();
  *
- * @method Mongoose
+ * @method Growler
  * @api public
  */
 
-Mongoose.prototype.Mongoose = Mongoose;
+Growler.prototype.Growler = Growler;
 
 /*
- * The Mongoose [Schema](#schema_Schema) constructor
+ * The Growler [Schema](#schema_Schema) constructor
  *
  * #### Example:
  *
- *     var mongoose = require('mongoose');
- *     var Schema = mongoose.Schema;
+ *     var growler = require('growler');
+ *     var Schema = growler.Schema;
  *     var CatSchema = new Schema(..);
  *
  * @method Schema
@@ -166,8 +174,17 @@ Mongoose.prototype.Mongoose = Mongoose;
 
 Growler.prototype.Schema = Schema;
 
+/**
+ * The Growler [Model](#model_Model) constructor.
+ *
+ * @method Model
+ * @api public
+ */
+
+Growler.prototype.Model = Model;
+
 /*!
- * The exports object is an instance of Mongoose.
+ * The exports object is an instance of Growler.
  *
  * @api public
  */
