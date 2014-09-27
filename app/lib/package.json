@@ -1,0 +1,11 @@
+{
+  "name": "growler",
+  "description": "Neo4j graph database object mapper",
+  "version": "0.0.1-pre",
+  "author": "Dave S <dave91x@gmail.com>",
+  "keywords": ["neo4j", "graph", "model", "schema", "database", "data", "datastore", "query", "nosql", "orm", "db"],
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "directories": {"lib": "./lib/growler"},
+}
