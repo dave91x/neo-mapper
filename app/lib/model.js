@@ -223,6 +223,7 @@ Model.update = function update (conditions, callback) {
   delete conditions.id;
   
   console.log(nodeId + ":  " + conditions);
+  // match (n:User) WHERE id(n)=1087 SET n += {score: 51, birthday: 1951};
   
   var operation = this.db.operation('node/' + nodeId + '/properties', 'PUT', conditions);
   return this.db.call(operation, callback);
