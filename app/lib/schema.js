@@ -1,3 +1,10 @@
+/*!
+ * Module dependencies.
+ */
+
+var utils = require('./utils');
+
+
 /*
  * Schema constructor.
  *
@@ -102,6 +109,92 @@ function Schema (obj, options) {
   //    next();
   //  });
   //}
-}
+};
 
-module.exports = Schema;
+/*
+ * Returns default options for this schema, merged with `options`.
+ *
+ * @param {Object} options
+ * @return {Object}
+ * @api private
+ */
+
+Schema.prototype.defaultOptions = function (options) {
+  if (options && false === options.safe) {
+    options.safe = { w: 0 };
+  }
+
+  if (options && options.safe && 0 === options.safe.w) {
+    // if you turn off safe writes, then versioning goes off as well
+    options.versionKey = false;
+  }
+
+  options = utils.options({
+      strict: true
+    , bufferCommands: true
+    , capped: false // { size, max, autoIndexId }
+    , versionKey: '__v'
+    , discriminatorKey: '__t'
+    , minimize: true
+    , autoIndex: true
+    , shardKey: null
+    , read: null
+    , validateBeforeSave: true
+    // the following are only applied at construction time
+    , noId: false // deprecated, use { _id: false }
+    , _id: true
+    , noVirtualId: false // deprecated, use { id: false }
+    , id: true
+//    , pluralization: true  // only set this to override the global option
+  }, options);
+
+  if (options.read) {
+    options.read = utils.readPref(options.read);
+  }
+
+  return options;
+};
+
+/*
+ * Adds key path / schema type pairs to this schema.
+ *
+ * #### Example:
+ *
+ *     var ToySchema = new Schema;
+ *     ToySchema.add({ name: 'string', color: 'string', price: 'number' });
+ *
+ * @param {Object} obj
+ * @param {String} prefix
+ * @api public
+ */
+
+Schema.prototype.add = function add (obj, prefix) {
+  prefix = prefix || '';
+  var keys = Object.keys(obj);
+
+  for (var i = 0; i < keys.length; ++i) {
+    var key = keys[i];
+
+    if (null == obj[key]) {
+      throw new TypeError('Invalid value for schema path `'+ prefix + key +'`');
+    }
+
+    if (utils.isObject(obj[key]) && (!obj[key].constructor || 'Object' == utils.getFunctionName(obj[key].constructor)) && (!obj[key].type || obj[key].type.type)) {
+      if (Object.keys(obj[key]).length) {
+        // nested object { last: { name: String }}
+        this.nested[prefix + key] = true;
+        this.add(obj[key], prefix + key + '.');
+      } else {
+        this.path(prefix + key, obj[key]); // mixed type
+      }
+    } else {
+      this.path(prefix + key, obj[key]);
+    }
+  }
+};
+
+/*!
+ * Module exports.
+ */
+ 
+module.exports = exports = Schema;

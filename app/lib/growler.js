@@ -174,7 +174,7 @@ Growler.prototype.Growler = Growler;
 
 Growler.prototype.Schema = Schema;
 
-/**
+/*
  * The Growler [Model](#model_Model) constructor.
  *
  * @method Model
