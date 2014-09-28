@@ -108,7 +108,7 @@ Growler.prototype.get = Growler.prototype.set;
  * @api public
  */
  
-Growler.prototype.model  = function (name, schema) {
+Growler.prototype.model = function (name, schema) {
   
   if ('string' == typeof schema) {
     schema = false;
@@ -118,6 +118,15 @@ Growler.prototype.model  = function (name, schema) {
     schema = new Schema(schema);
   }
   
+  // handle internal options from connection.model()
+  var options = {};
+  // if (skipInit && utils.isObject(skipInit)) {
+  //   options = skipInit;
+  //   skipInit = true;
+  // } else {
+  //   options = {};
+  // }
+
   // look up schema for the collection. this might be a
   // default schema like system.indexes stored in SchemaDefaults.
   if (!this.modelSchemas[name]) {
@@ -176,7 +185,7 @@ Growler.prototype.model  = function (name, schema) {
   // }
 
   // var connection = options.connection || this.connection;
-  model = Model.compile(name, schema, collection, connection, this);
+  model = Model.compile(name, schema, neoDb, this);
 
   // if (!skipInit) {
   //   model.init();
@@ -185,7 +194,8 @@ Growler.prototype.model  = function (name, schema) {
   if (false === options.cache) {
     return model;
   }
-    
+  
+  console.log(model);
   return this.models[name] = model;
 };
 

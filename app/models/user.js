@@ -10,12 +10,14 @@ console.log('growler version: ' + growler.version);
 // console.log(growler.model('User'));
 
 var userSchema = growler.Schema({
+  uid          : String,
+  first_name   : String,
   email        : String,
   password     : String,
-  first_name   : String,
   phone        : String,
   zipcode      : String,
-  birthday     : Number
+  birthday     : Number,
+  score        : Number
 });
 
 // var users = {

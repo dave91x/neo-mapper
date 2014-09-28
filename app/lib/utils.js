@@ -107,13 +107,13 @@ exports.clone = function clone (obj, options) {
   if (Array.isArray(obj))
     return cloneArray(obj, options);
 
-  if (isMongooseObject(obj)) {
-    if (options && options.json && 'function' === typeof obj.toJSON) {
-      return obj.toJSON(options);
-    } else {
-      return obj.toObject(options);
-    }
-  }
+  // if (isMongooseObject(obj)) {
+  //   if (options && options.json && 'function' === typeof obj.toJSON) {
+  //     return obj.toJSON(options);
+  //   } else {
+  //     return obj.toObject(options);
+  //   }
+  // }
 
   if (obj.constructor) {
     switch (exports.getFunctionName(obj.constructor)) {
@@ -129,8 +129,8 @@ exports.clone = function clone (obj, options) {
     }
   }
 
-  if (obj instanceof ObjectId)
-    return new ObjectId(obj.id);
+  // if (obj instanceof ObjectId)
+  //   return new ObjectId(obj.id);
 
   if (!obj.constructor && exports.isObject(obj)) {
     // object created with Object.create(null)

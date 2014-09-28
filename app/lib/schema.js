@@ -193,7 +193,7 @@ Schema.prototype.method = function (name, fn) {
   return this;
 };
 
-/**
+/*
  * Sets/gets a schema option.
  *
  * @param {String} key option name
@@ -272,22 +272,6 @@ Schema.prototype.add = function add (obj, prefix) {
 };
 
 /*
- * Gets/sets schema paths.
- *
- * Sets a path (if arity 2)
- * Gets a path (if arity 1)
- *
- * ####Example
- *
- *     schema.path('name') // returns a SchemaType
- *     schema.path('name', Number) // changes the schemaType of `name` to Number
- *
- * @param {String} path
- * @param {Object} constructor
- * @api public
- */
- 
-/**
  * Reserved document keys.
  *
  * Keys in this object are names that are rejected in schema declarations b/c they conflict 
@@ -321,6 +305,22 @@ reserved.emit =    // EventEmitter
 reserved._events = // EventEmitter
 reserved._pres = reserved._posts = 1 // hooks.js
 
+/*
+ * Gets/sets schema paths.
+ *
+ * Sets a path (if arity 2)
+ * Gets a path (if arity 1)
+ *
+ * ####Example
+ *
+ *     schema.path('name') // returns a SchemaType
+ *     schema.path('name', Number) // changes the schemaType of `name` to Number
+ *
+ * @param {String} path
+ * @param {Object} constructor
+ * @api public
+ */
+ 
 Schema.prototype.path = function (path, obj) {
   if (obj == undefined) {
     if (this.paths[path]) return this.paths[path];
@@ -357,9 +357,151 @@ Schema.prototype.path = function (path, obj) {
 
   branch[last] = utils.clone(obj);
 
-  this.paths[path] = Schema.interpretAsType(path, obj);
+  this.paths[path] = obj;  // Schema.interpretAsType(path, obj);
   return this;
 };
+
+/*
+ * Converts type arguments into Mongoose/Growler Types.
+ *
+ * @param {String} path
+ * @param {Object} obj constructor
+ * @api private
+ */
+
+Schema.interpretAsType = function (path, obj) {
+  // if (obj.constructor) {
+  //   var constructorName = utils.getFunctionName(obj.constructor);
+  //   if (constructorName != 'Object') {
+  //     obj = { type: obj };
+  //   }
+  // }
+  return obj.constructor;
+};
+
+/**
+ * Iterates the schemas paths similar to Array#forEach.
+ *
+ * The callback is passed the pathname and schemaType as arguments on each iteration.
+ *
+ * @param {Function} fn callback function
+ * @return {Schema} this
+ * @api public
+ */
+
+Schema.prototype.eachPath = function (fn) {
+  var keys = Object.keys(this.paths)
+    , len = keys.length;
+
+  for (var i = 0; i < len; ++i) {
+    fn(keys[i], this.paths[keys[i]]);
+  }
+
+  return this;
+};
+
+/**
+ * Returns an Array of path strings that are required by this schema.
+ *
+ * @api public
+ * @return {Array}
+ */
+
+Schema.prototype.requiredPaths = function requiredPaths () {
+  if (this._requiredpaths) return this._requiredpaths;
+
+  var paths = Object.keys(this.paths)
+    , i = paths.length
+    , ret = [];
+
+  while (i--) {
+    var path = paths[i];
+    if (this.paths[path].isRequired) ret.push(path);
+  }
+
+  return this._requiredpaths = ret;
+}
+
+/**
+ * Returns indexes from fields and schema-level indexes (cached).
+ *
+ * @api private
+ * @return {Array}
+ */
+
+Schema.prototype.indexedPaths = function indexedPaths () {
+  if (this._indexedpaths) return this._indexedpaths;
+
+  return this._indexedpaths = this.indexes();
+}
+
+/**
+ * Returns the pathType of `path` for this schema.
+ *
+ * Given a path, returns whether it is a real, virtual, nested, or ad-hoc/undefined path.
+ *
+ * @param {String} path
+ * @return {String}
+ * @api public
+ */
+
+Schema.prototype.pathType = function (path) {
+  if (path in this.paths) return 'real';
+  if (path in this.virtuals) return 'virtual';
+  if (path in this.nested) return 'nested';
+  if (path in this.subpaths) return 'real';
+
+  if (/\.\d+\.|\.\d+$/.test(path) && getPositionalPath(this, path)) {
+    return 'real';
+  } else {
+    return 'adhocOrUndefined'
+  }
+};
+
+/*!
+ * ignore
+ */
+
+function getPositionalPath (self, path) {
+  var subpaths = path.split(/\.(\d+)\.|\.(\d+)$/).filter(Boolean);
+  if (subpaths.length < 2) {
+    return self.paths[subpaths[0]];
+  }
+
+  var val = self.path(subpaths[0]);
+  if (!val) return val;
+
+  var last = subpaths.length - 1
+    , subpath
+    , i = 1;
+
+  for (; i < subpaths.length; ++i) {
+    subpath = subpaths[i];
+
+    if (i === last && val && !val.schema && !/\D/.test(subpath)) {
+      if (val instanceof MongooseTypes.Array) {
+        // StringSchema, NumberSchema, etc
+        val = val.caster;
+      } else {
+        val = undefined;
+      }
+      break;
+    }
+
+    // ignore if its just a position segment: path.0.subpath
+    if (!/\D/.test(subpath)) continue;
+
+    if (!(val && val.schema)) {
+      val = undefined;
+      break;
+    }
+
+    val = val.schema.path(subpath);
+  }
+
+  return self.subpaths[path] = val;
+}
+
 
 /*!
  * Module exports.
