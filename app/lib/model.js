@@ -135,6 +135,31 @@ Model.find = function find (conditions, fields, options, callback) {
 };
 
 /*
+ * Returns all nodes in the database of this model.
+ *
+ * #### Example:
+ *
+ *     Adventure.all({ type: 'jungle' }, function (err, results) {
+ *       if (err) ..
+ *       console.log(results);
+ *     });
+ *
+ * @param {Object} conditions
+ * @param {Function} [callback]
+ * @return {Query}
+ * @api public
+ */
+
+Model.all = function all (conditions, callback) {
+  if ('function' === typeof conditions)
+    callback = conditions, conditions = {};
+  
+  qstr = "MATCH (n:" + this.modelName + ") RETURN n";
+  
+  return this.db.query(qstr, callback);
+};
+
+/*
  * Finds a single document by id.
  *
  * The `id` is cast based on the Schema before sending the command.
@@ -172,10 +197,6 @@ Model.find = function find (conditions, fields, options, callback) {
  * @api public
  */
 
-// Model.findById = function findById (id, fields, options, callback) {
-//   return this.findOne({ _id: id }, fields, options, callback);
-// };
-
 Model.findById = function findById (conditions, callback) {
   if ('function' === typeof conditions)
     throw new Error('Have to include conditions for entity ID!');
@@ -186,16 +207,27 @@ Model.findById = function findById (conditions, callback) {
   return this.db.query(qstr, callback);
 };
 
-Model.all = function all (conditions, callback) {
-  if ('function' === typeof conditions)
-    callback = conditions, conditions = {};
+/*
+ * Updates a single node by id.
+ *
+ * @api public
+ */
 
-  // get the mongodb collection object
-  // var mq = new Query({}, {}, this, this.collection);
+Model.update = function update (conditions, callback) {
+  if ('function' === typeof conditions)
+    throw new Error('Have to include update conditions for entity ID!');
   
-  qstr = "MATCH (n:" + this.modelName + ") RETURN n";
-  // return mq.count(conditions, callback);
-  return this.db.query(qstr, callback);
+  console.log(conditions);
+  
+  var nodeId = conditions.id;
+  delete conditions.id;
+  
+  console.log(nodeId + ":  " + conditions);
+  
+  var operation = this.db.operation('node/' + nodeId + '/properties', 'PUT', conditions);
+  return this.db.call(operation, callback);
+  
+  // return this.db.save(conditions, callback);
 };
 
 /*
@@ -287,35 +319,6 @@ Model.count = function count (conditions, callback) {
   // return mq.count(conditions, callback);
   return undefined;
 };
-
-/*
- * Returns all nodes in the database of this model.
- *
- * #### Example:
- *
- *     Adventure.all({ type: 'jungle' }, function (err, results) {
- *       if (err) ..
- *       console.log(results);
- *     });
- *
- * @param {Object} conditions
- * @param {Function} [callback]
- * @return {Query}
- * @api public
- */
-
-Model.all = function all (conditions, callback) {
-  if ('function' === typeof conditions)
-    callback = conditions, conditions = {};
-
-  // get the mongodb collection object
-  // var mq = new Query({}, {}, this, this.collection);
-  
-  qstr = "MATCH (n:" + this.modelName + ") RETURN n";
-  // return mq.count(conditions, callback);
-  return this.db.query(qstr, callback);
-};
-
 
 /*!
  * Compiler utility.

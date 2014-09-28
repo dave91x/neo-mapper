@@ -1,4 +1,5 @@
 // this will eventually become the index.js file in the repo lib directory
+// http://tobyho.com/2010/11/22/javascript-constructors-and/
 
 // db (Neo4j via seraph npm)
 var neoDb   = require('seraph')();

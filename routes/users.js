@@ -19,6 +19,18 @@ router.get('/:uid', function(req, res) {
   });
 });
 
+router.post('/:uid', function(req, res) {
+  // console.log(req.body);
+  var updates = req.body;
+  updates.id = parseInt(updates.id);
+  // console.log(updates);
+  User.update(updates, function(err) {
+    if (err) throw err;
+    
+    res.redirect('/users');
+  });
+});
+
 module.exports = router;
 
 // 08e45e37-2fc8-47ee-b5f5-bce29b771c92   Dave
