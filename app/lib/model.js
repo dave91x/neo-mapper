@@ -266,6 +266,34 @@ Model.count = function count (conditions, callback) {
   return 200;
 };
 
+/*
+ * Returns all nodes in the database of this model.
+ *
+ * #### Example:
+ *
+ *     Adventure.all({ type: 'jungle' }, function (err, results) {
+ *       if (err) ..
+ *       console.log(results);
+ *     });
+ *
+ * @param {Object} conditions
+ * @param {Function} [callback]
+ * @return {Query}
+ * @api public
+ */
+
+Model.all = function count (conditions, callback) {
+  if ('function' === typeof conditions)
+    callback = conditions, conditions = {};
+
+  // get the mongodb collection object
+  // var mq = new Query({}, {}, this, this.collection);
+  
+  
+  // return mq.count(conditions, callback);
+  return 200;
+};
+
 
 /*!
  * Compiler utility.

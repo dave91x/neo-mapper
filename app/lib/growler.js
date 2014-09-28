@@ -137,7 +137,7 @@ Growler.prototype.model = function (name, schema) {
     if (schema) {
       // cache it so we only apply plugins once
       this.modelSchemas[name] = schema;
-      console.log(this.modelSchemas);
+      // console.log(this.modelSchemas);
       // this._applyPlugins(schema);
     } else {
       // throw new mongoose.Error.MissingSchemaError(name);
@@ -195,7 +195,7 @@ Growler.prototype.model = function (name, schema) {
     return model;
   }
   
-  console.log(model);
+  // console.log(model);
   return this.models[name] = model;
 };
 
