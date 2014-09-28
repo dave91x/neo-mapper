@@ -7,7 +7,7 @@ var _          = require('underscore');
 
 // test setup verification
 console.log('growler version: ' + growler.version);
-console.log(growler.model('User'));
+// console.log(growler.model('User'));
 
 var userSchema = growler.Schema({
   email        : String,

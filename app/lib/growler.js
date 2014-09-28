@@ -1,10 +1,11 @@
 // this will eventually become the index.js file in the repo lib directory
 
 // db (Neo4j via seraph npm)
-var neoDb   = require("seraph")();
+var neoDb   = require('seraph')();
 var Model   = require('./model');
 var Schema  = require('./schema');
 var pkg     = require('./package.json');
+var utils   = require('./utils');
 
 /*
  * Growler constructor.
@@ -113,8 +114,78 @@ Growler.prototype.model  = function (name, schema) {
     schema = false;
   }
   
+  if (utils.isObject(schema) && !(schema instanceof Schema)) {
+    schema = new Schema(schema);
+  }
+  
+  // look up schema for the collection. this might be a
+  // default schema like system.indexes stored in SchemaDefaults.
+  if (!this.modelSchemas[name]) {
+    // if (!schema && name in SchemaDefaults) {
+    //   schema = SchemaDefaults[name];
+    // }
+
+    if (schema) {
+      // cache it so we only apply plugins once
+      this.modelSchemas[name] = schema;
+      console.log(this.modelSchemas);
+      // this._applyPlugins(schema);
+    } else {
+      // throw new mongoose.Error.MissingSchemaError(name);
+      throw new Error('missing schema: ' + name);
+    }
+  }
+  
   var model;
   
+  // connection.model() may be passing a different schema for
+  // an existing model name. in this case don't read from cache.
+  if (this.models[name] && false !== options.cache) {
+    if (schema instanceof Schema && schema != this.models[name].schema) {
+      // throw new mongoose.Error.OverwriteModelError(name);
+      throw new Error('overwrite model error: ' + name);
+    }
+
+    // if (collection) {
+    //   // subclass current model with alternate collection
+    //   model = this.models[name];
+    //   schema = model.prototype.schema;
+    //   sub = model.__subclass(this.connection, schema, collection);
+    //   // do not cache the sub model
+    //   return sub;
+    // }
+
+    return this.models[name];
+  }
+
+  // ensure a schema exists
+  if (!schema) {
+    schema = this.modelSchemas[name];
+    if (!schema) {
+      // throw new mongoose.Error.MissingSchemaError(name);
+      throw new Error('missing schema: ' + name);
+    }
+  }
+
+  // Apply relevant "global" options to the schema
+  if (!('pluralization' in schema.options)) schema.options.pluralization = this.options.pluralization;
+
+
+  // if (!collection) {
+  //   collection = schema.get('collection') || format(name, schema.options);
+  // }
+
+  // var connection = options.connection || this.connection;
+  model = Model.compile(name, schema, collection, connection, this);
+
+  // if (!skipInit) {
+  //   model.init();
+  // }
+
+  if (false === options.cache) {
+    return model;
+  }
+    
   return this.models[name] = model;
 };
 

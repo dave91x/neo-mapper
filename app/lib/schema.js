@@ -4,7 +4,6 @@
 
 var utils = require('./utils');
 
-
 /*
  * Schema constructor.
  *
@@ -12,7 +11,7 @@ var utils = require('./utils');
  *
  *     var child = new Schema({ name: String });
  *     var schema = new Schema({ name: String, age: Number, children: [child] });
- *     var Tree = mongoose.model('Tree', schema);
+ *     var Tree = growler.model('Tree', schema);
  *
  *     // setting schema options
  *     new Schema({ name: String }, { _id: false, autoIndex: false })
@@ -141,18 +140,97 @@ Schema.prototype.defaultOptions = function (options) {
     , read: null
     , validateBeforeSave: true
     // the following are only applied at construction time
-    , noId: false // deprecated, use { _id: false }
     , _id: true
-    , noVirtualId: false // deprecated, use { id: false }
     , id: true
-//    , pluralization: true  // only set this to override the global option
+    // , pluralization: true  // only set this to override the global option
   }, options);
 
-  if (options.read) {
-    options.read = utils.readPref(options.read);
-  }
+  // if (options.read) {
+  //   options.read = utils.readPref(options.read);
+  // }
 
   return options;
+};
+
+/*
+ * Adds an instance method to documents constructed from Models compiled from this schema.
+ *
+ * #### Example
+ *
+ *     var schema = kittySchema = new Schema(..);
+ *
+ *     schema.method('meow', function () {
+ *       console.log('meeeeeoooooooooooow');
+ *     })
+ *
+ *     var Kitty = growler.model('Kitty', schema);
+ *
+ *     var fizz = new Kitty;
+ *     fizz.meow(); // meeeeeooooooooooooow
+ *
+ * If a hash of name/fn pairs is passed as the only argument, each name/fn pair will be added as methods.
+ *
+ *     schema.method({
+ *         purr: function () {}
+ *       , scratch: function () {}
+ *     });
+ *
+ *     // later
+ *     fizz.purr();
+ *     fizz.scratch();
+ *
+ * @param {String|Object} method name
+ * @param {Function} [fn]
+ * @api public
+ */
+
+Schema.prototype.method = function (name, fn) {
+  if ('string' != typeof name)
+    for (var i in name)
+      this.methods[i] = name[i];
+  else
+    this.methods[name] = fn;
+  return this;
+};
+
+/**
+ * Sets/gets a schema option.
+ *
+ * @param {String} key option name
+ * @param {Object} [value] if not passed, the current option value is returned
+ * @api public
+ */
+
+Schema.prototype.set = function (key, value, _tags) {
+  if (1 === arguments.length) {
+    return this.options[key];
+  }
+
+  switch (key) {
+    case 'read':
+      // this.options[key] = utils.readPref(value, _tags)
+      break;
+    case 'safe':
+      this.options[key] = false === value
+        ? { w: 0 }
+        : value
+      break;
+    default:
+      this.options[key] = value;
+  }
+
+  return this;
+}
+
+/*
+ * Gets a schema option.
+ *
+ * @param {String} key option name
+ * @api public
+ */
+
+Schema.prototype.get = function (key) {
+  return this.options[key];
 };
 
 /*
@@ -191,6 +269,96 @@ Schema.prototype.add = function add (obj, prefix) {
       this.path(prefix + key, obj[key]);
     }
   }
+};
+
+/*
+ * Gets/sets schema paths.
+ *
+ * Sets a path (if arity 2)
+ * Gets a path (if arity 1)
+ *
+ * ####Example
+ *
+ *     schema.path('name') // returns a SchemaType
+ *     schema.path('name', Number) // changes the schemaType of `name` to Number
+ *
+ * @param {String} path
+ * @param {Object} constructor
+ * @api public
+ */
+ 
+/**
+ * Reserved document keys.
+ *
+ * Keys in this object are names that are rejected in schema declarations b/c they conflict 
+ * with growler functionality. Using these key name will throw an error.
+ *
+ *      on, emit, _events, db, get, set, init, isNew, errors, schema, options, modelName, collection, _pres, _posts, toObject
+ *
+ * _NOTE:_ Use of these terms as method names is permitted, but play at your own risk, as they may 
+ *  be existing growler document methods you are stomping on.
+ *
+ *      var schema = new Schema(..);
+ *      schema.methods.init = function () {} // potentially breaking
+ */
+
+Schema.reserved = Object.create(null);
+var reserved = Schema.reserved;
+reserved.on =
+reserved.db =
+reserved.set =
+reserved.get =
+reserved.init =
+reserved.isNew =
+reserved.errors =
+reserved.schema =
+reserved.options =
+reserved.modelName =
+reserved.collection =
+reserved.toObject =
+reserved.domain =
+reserved.emit =    // EventEmitter
+reserved._events = // EventEmitter
+reserved._pres = reserved._posts = 1 // hooks.js
+
+Schema.prototype.path = function (path, obj) {
+  if (obj == undefined) {
+    if (this.paths[path]) return this.paths[path];
+    if (this.subpaths[path]) return this.subpaths[path];
+
+    // subpaths?
+    return /\.\d+\.?.*$/.test(path)
+      ? getPositionalPath(this, path)
+      : undefined;
+  }
+
+  // some path names conflict with document methods
+  if (reserved[path]) {
+    throw new Error("`" + path + "` may not be used as a schema pathname");
+  }
+
+  // update the tree
+  var subpaths = path.split(/\./)
+    , last = subpaths.pop()
+    , branch = this.tree;
+
+  subpaths.forEach(function(sub, i) {
+    if (!branch[sub]) branch[sub] = {};
+    if ('object' != typeof branch[sub]) {
+      var msg = 'Cannot set nested path `' + path + '`. '
+              + 'Parent path `'
+              + subpaths.slice(0, i).concat([sub]).join('.')
+              + '` already set to type ' + branch[sub].name
+              + '.';
+      throw new Error(msg);
+    }
+    branch = branch[sub];
+  });
+
+  branch[last] = utils.clone(obj);
+
+  this.paths[path] = Schema.interpretAsType(path, obj);
+  return this;
 };
 
 /*!
