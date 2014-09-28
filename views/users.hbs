@@ -1,10 +1,24 @@
 <h1>{{title}}</h1>
 <p>User count: &nbsp;{{userCount}}</p>
-<ul>
-  {{#users}}
-    <li>({{uid}}) {{name}}</li>
-  {{/users}}
-</ul>
-<br/>
+<table class="table">
+  <thead>
+    <tr>
+      <th>First Name</th>
+      <th>Email</th>
+      <th>Zip Code</th>
+      <th><i class="fa fa-plus"></i></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#users}}
+      <tr>
+        <td>{{first_name}}</td>
+        <td>{{email}}</td>
+        <td>{{zipcode}}</td>
+        <td><a href="/users/{{uid}}"><i class="fa fa-pencil"></i></a></td>
+      </tr>
+    {{/users}}
+  </tbody>
+</table>
 <br/>
 <p>User.find(uid) is {{userX.name}} when uid = {{userX.uid}}</p>

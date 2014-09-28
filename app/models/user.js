@@ -3,9 +3,9 @@
 // eventually tie in growler db adapter here
 var growler    = require('../lib/growler');
 var bcrypt     = require('bcrypt-nodejs');
-var _          = require('underscore');
+// var _          = require('underscore');
 
-// test setup verification
+// setup verification
 console.log('growler version: ' + growler.version);
 
 var userSchema = growler.Schema({

@@ -5,8 +5,20 @@ var User      = require('../app/models/user');
 
 /* GET users listing. */
 router.get('/', function(req, res) {
-  // res.render('users', { title: 'User List', users: User.all(), userX: User.find(9) });
-  res.render('users', { title: 'User List', userCount: User.count() });
+  var users = [];
+  User.all(function(err, results) {
+    users = results;
+    res.render('users', { title: 'User List', users: users, userCount: users.length });
+  });
+});
+
+router.get('/:uid', function(req, res) {
+  User.findById("{ uid: '" + req.param('uid') + "' }", function(err, results) {
+    console.log(results[0]);
+    res.render('user', { title: 'User Profile', user: results[0] });
+  });
 });
 
 module.exports = router;
+
+// 08e45e37-2fc8-47ee-b5f5-bce29b771c92   Dave

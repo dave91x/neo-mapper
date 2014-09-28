@@ -172,8 +172,30 @@ Model.find = function find (conditions, fields, options, callback) {
  * @api public
  */
 
-Model.findById = function findById (id, fields, options, callback) {
-  return this.findOne({ _id: id }, fields, options, callback);
+// Model.findById = function findById (id, fields, options, callback) {
+//   return this.findOne({ _id: id }, fields, options, callback);
+// };
+
+Model.findById = function findById (conditions, callback) {
+  if ('function' === typeof conditions)
+    throw new Error('Have to include conditions for entity ID!');
+  
+  qstr = "MATCH (n:" + this.modelName + " " + conditions + ") RETURN n";
+  console.log(qstr);
+  // return mq.count(conditions, callback);
+  return this.db.query(qstr, callback);
+};
+
+Model.all = function all (conditions, callback) {
+  if ('function' === typeof conditions)
+    callback = conditions, conditions = {};
+
+  // get the mongodb collection object
+  // var mq = new Query({}, {}, this, this.collection);
+  
+  qstr = "MATCH (n:" + this.modelName + ") RETURN n";
+  // return mq.count(conditions, callback);
+  return this.db.query(qstr, callback);
 };
 
 /*
@@ -263,7 +285,7 @@ Model.count = function count (conditions, callback) {
   // var mq = new Query({}, {}, this, this.collection);
 
   // return mq.count(conditions, callback);
-  return 200;
+  return undefined;
 };
 
 /*
@@ -282,16 +304,16 @@ Model.count = function count (conditions, callback) {
  * @api public
  */
 
-Model.all = function count (conditions, callback) {
+Model.all = function all (conditions, callback) {
   if ('function' === typeof conditions)
     callback = conditions, conditions = {};
 
   // get the mongodb collection object
   // var mq = new Query({}, {}, this, this.collection);
   
-  
+  qstr = "MATCH (n:" + this.modelName + ") RETURN n";
   // return mq.count(conditions, callback);
-  return 200;
+  return this.db.query(qstr, callback);
 };
 
 
