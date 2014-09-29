@@ -1,3 +1,5 @@
+var util    = require('util');
+
 /*
  * Model constructor
  *
@@ -217,20 +219,20 @@ Model.update = function update (conditions, callback) {
   if ('function' === typeof conditions)
     throw new Error('Have to include update conditions for entity ID!');
   
-  console.log(conditions);
+  // console.log(conditions);
   
   var nodeUid = conditions.uid;
   delete conditions.id;
   delete conditions.uid;
   
-  console.log(nodeUid + ":  ");
-  console.log(conditions);
+  // console.log(nodeUid + ":  ");
+  // console.log(conditions);
   // match (n:User) WHERE id(n)=1087 SET n += {score: 51, birthday: 1951};
   // var operation = this.db.operation('node/' + nodeId + '/properties', 'PUT', conditions);
   // return this.db.call(operation, callback);
   
-  qstr = "MATCH (n:" + this.modelName + ") WHERE n.uid='" + nodeUid + "' SET n += " + JSON.stringify(conditions);
-  console.log(qstr);
+  qstr = "MATCH (n:" + this.modelName + ") WHERE n.uid='" + nodeUid + "' SET n += " + util.inspect(conditions);
+  // console.log(qstr);
   
   return this.db.query(qstr, callback);
 };
@@ -273,30 +275,30 @@ Model.update = function update (conditions, callback) {
  * @api public
  */
 
-Model.findOne = function findOne (conditions, fields, options, callback) {
-  if ('function' == typeof options) {
-    callback = options;
-    options = null;
-  } else if ('function' == typeof fields) {
-    callback = fields;
-    fields = null;
-    options = null;
-  } else if ('function' == typeof conditions) {
-    callback = conditions;
-    conditions = {};
-    fields = null;
-    options = null;
-  }
-
-  // get the mongodb collection object
-  var mq = new Query({}, options, this, this.collection);
-  mq.select(fields);
-  if (this.schema.discriminatorMapping && mq.selectedInclusively()) {
-    mq.select(this.schema.options.discriminatorKey);
-  }
-
-  return mq.findOne(conditions, callback);
-};
+// Model.findOne = function findOne (conditions, fields, options, callback) {
+//   if ('function' == typeof options) {
+//     callback = options;
+//     options = null;
+//   } else if ('function' == typeof fields) {
+//     callback = fields;
+//     fields = null;
+//     options = null;
+//   } else if ('function' == typeof conditions) {
+//     callback = conditions;
+//     conditions = {};
+//     fields = null;
+//     options = null;
+//   }
+// 
+//   // get the mongodb collection object
+//   var mq = new Query({}, options, this, this.collection);
+//   mq.select(fields);
+//   if (this.schema.discriminatorMapping && mq.selectedInclusively()) {
+//     mq.select(this.schema.options.discriminatorKey);
+//   }
+// 
+//   return mq.findOne(conditions, callback);
+// };
 
 /*
  * Counts number of matching documents in a database collection.

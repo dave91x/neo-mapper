@@ -5,6 +5,9 @@ var User      = require('../app/models/user');
 
 /* GET users listing. */
 router.get('/', function(req, res) {
+  
+  newUser = new User();
+  console.log(newUser.testUser('raygun'));
   var users = [];
   User.all(function(err, results) {
     users = results;
@@ -24,7 +27,7 @@ router.post('/:uid', function(req, res) {
   var updates = req.body;
   updates.id = parseInt(updates.id);
   // console.log(updates);
-  // console.log(User.testUser('raygun'));
+  
   User.update(updates, function(err) {
     if (err) throw err;
     
