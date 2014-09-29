@@ -24,6 +24,7 @@ router.post('/:uid', function(req, res) {
   var updates = req.body;
   updates.id = parseInt(updates.id);
   // console.log(updates);
+  console.log(User.testUser('raygun'));
   User.update(updates, function(err) {
     if (err) throw err;
     

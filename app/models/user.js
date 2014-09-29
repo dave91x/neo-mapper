@@ -52,5 +52,10 @@ userSchema.methods.validPassword = function(password) {
   return bcrypt.compareSync(password, this.local.password);
 };
 
+// test method for userSchema
+userSchema.methods.testUser = function(str) {
+  return "Schema method:  " + str;
+};
+
 // create the model for users and expose it to our app
 module.exports = growler.model('User', userSchema);

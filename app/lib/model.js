@@ -203,7 +203,7 @@ Model.findById = function findById (conditions, callback) {
   
   qstr = "MATCH (n:" + this.modelName + " " + conditions + ") RETURN n";
   console.log(qstr);
-  // return mq.count(conditions, callback);
+  
   return this.db.query(qstr, callback);
 };
 
@@ -219,16 +219,18 @@ Model.update = function update (conditions, callback) {
   
   console.log(conditions);
   
-  var nodeId = conditions.id;
-  delete conditions.id;
+  var nodeUid = conditions.uid;
+  delete conditions.uid;
   
-  console.log(nodeId + ":  " + conditions);
+  console.log(nodeUid + ":  " + JSON.stringify(conditions));
   // match (n:User) WHERE id(n)=1087 SET n += {score: 51, birthday: 1951};
+  // var operation = this.db.operation('node/' + nodeId + '/properties', 'PUT', conditions);
+  // return this.db.call(operation, callback);
   
-  var operation = this.db.operation('node/' + nodeId + '/properties', 'PUT', conditions);
-  return this.db.call(operation, callback);
+  qstr = "MATCH (n:" + this.modelName + ") WHERE n.uid='" + nodeUid + "' SET n += " + conditions;
+  console.log(qstr);
   
-  // return this.db.save(conditions, callback);
+  return this.db.query(qstr, callback);
 };
 
 /*
