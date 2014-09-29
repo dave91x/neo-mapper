@@ -220,14 +220,16 @@ Model.update = function update (conditions, callback) {
   console.log(conditions);
   
   var nodeUid = conditions.uid;
+  delete conditions.id;
   delete conditions.uid;
   
-  console.log(nodeUid + ":  " + JSON.stringify(conditions));
+  console.log(nodeUid + ":  ");
+  console.log(conditions);
   // match (n:User) WHERE id(n)=1087 SET n += {score: 51, birthday: 1951};
   // var operation = this.db.operation('node/' + nodeId + '/properties', 'PUT', conditions);
   // return this.db.call(operation, callback);
   
-  qstr = "MATCH (n:" + this.modelName + ") WHERE n.uid='" + nodeUid + "' SET n += " + conditions;
+  qstr = "MATCH (n:" + this.modelName + ") WHERE n.uid='" + nodeUid + "' SET n += " + JSON.stringify(conditions);
   console.log(qstr);
   
   return this.db.query(qstr, callback);
