@@ -1,4 +1,4 @@
-var util    = require('util');
+var util = require('util');
 
 /*
  * Model constructor
@@ -217,7 +217,7 @@ Model.findById = function findById (conditions, callback) {
 
 Model.update = function update (conditions, callback) {
   if ('function' === typeof conditions)
-    throw new Error('Have to include update conditions for entity ID!');
+    throw new Error('Have to include update conditions along with entity ID!');
   
   // console.log(conditions);
   
@@ -332,9 +332,8 @@ Model.count = function count (conditions, callback) {
  *
  * @param {String} name model name
  * @param {Schema} schema
- * @param {String} collectionName
  * @param {Connection} connection
- * @param {Mongoose} base mongoose instance
+ * @param {Mongoose} base growler instance
  */
 
 Model.compile = function compile (name, schema, connection, base) {

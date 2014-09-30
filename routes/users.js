@@ -6,8 +6,8 @@ var User      = require('../app/models/user');
 /* GET users listing. */
 router.get('/', function(req, res) {
   
-  newUser = new User();
-  console.log(newUser.testUser('raygun'));
+  // newUser = new User();
+  // console.log(newUser.testUser('raygun'));
   var users = [];
   User.all(function(err, results) {
     users = results;
